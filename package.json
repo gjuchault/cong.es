@@ -6,19 +6,32 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "lint": "biome check --write ./app",
+    "typecheck": "react-router typegen && tsc",
+    "refresh-static-data": "bun ./scripts/refresh-days-off.ts"
+  },
+  "volta": {
+    "node": "23.8.0",
+    "npm": "10.9.2"
   },
   "dependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
     "@react-router/node": "^7.1.5",
     "@react-router/serve": "^7.1.5",
+    "clsx": "^2.1.1",
     "isbot": "^5.1.17",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router": "^7.1.5"
+    "react-router": "^7.1.5",
+    "temporal-polyfill": "^0.2.5",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@react-router/dev": "^7.1.5",
     "@tailwindcss/vite": "^4.0.0",
+    "@types/bun": "^1.2.2",
     "@types/node": "^20",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
