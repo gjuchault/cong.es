@@ -5,13 +5,13 @@ import { forwardRef } from "react";
 import { TouchTarget } from "./button";
 import { Link } from "./link";
 
-type AvatarProps = {
+interface AvatarProps {
 	src?: string | null;
 	square?: boolean;
 	initials?: string;
 	alt?: string;
 	className?: string;
-};
+}
 
 export function Avatar({
 	src = null,

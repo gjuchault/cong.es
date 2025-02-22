@@ -1,4 +1,11 @@
-export type RoundingMethod = "ceil-int" | "ceil-half" | "round-half";
+import { z } from "zod";
+
+export const roundingMethodSchema = z.union([
+	z.literal("ceil-int"),
+	z.literal("ceil-half"),
+	z.literal("round-half"),
+]);
+export type RoundingMethod = z.infer<typeof roundingMethodSchema>;
 
 export function round(
 	input: number,

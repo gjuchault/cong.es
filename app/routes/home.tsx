@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { Temporal } from "temporal-polyfill";
 import { Calendar } from "~/components/calendar/calendar";
-import { Field, Label } from "~/components/fieldset";
-import { Input } from "~/components/input";
-import { Select } from "~/components/select";
-import rawBankHolidays from "~/../static-data/bank-holidays.json";
-
-const bankHolidays = rawBankHolidays as [string, string][];
+import { Field, Label } from "~/components/catalyst/fieldset";
+import { Input } from "~/components/catalyst/input";
+import { Select } from "~/components/catalyst/select";
+import { useEmployeeSettings } from "~/hooks/use-employee-settings";
+import { rttTypeSchema } from "~/domain/rtt";
+import { z } from "zod";
+import { roundingMethodSchema } from "~/domain/helpers/round";
+import { plainDateSchema } from "~/helpers/schemas";
 
 export function meta() {
 	return [
@@ -16,13 +16,60 @@ export function meta() {
 }
 
 export default function Home() {
-	const [startDate, setStartDate] = useState(
-		Temporal.PlainDate.from("2025-02-01"),
-	);
-	const [rttType, setRttType] = useState("218j/an");
+	const [employeeSettings, setEmployeeSettings] = useEmployeeSettings();
 
 	function handleStartDateChange(e: React.ChangeEvent<HTMLInputElement>) {
-		setStartDate(Temporal.PlainDate.from(e.target.value));
+		const parseResult = plainDateSchema.safeParse(e.target.value);
+		if (parseResult.success === false) {
+			return;
+		}
+
+		setEmployeeSettings((currentSettings) => ({
+			...currentSettings,
+			startDate: parseResult.data,
+		}));
+	}
+
+	function handleRttTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+		const parseResult = rttTypeSchema.safeParse(e.target.value);
+		if (parseResult.success === false) {
+			return;
+		}
+
+		setEmployeeSettings((currentSettings) => ({
+			...currentSettings,
+			rttType: parseResult.data,
+		}));
+	}
+
+	function handleNPerYearChange(e: React.ChangeEvent<HTMLInputElement>) {
+		const parseResult = z.coerce
+			.number()
+			.int()
+			.safe()
+			.gt(8)
+			.safeParse(e.target.value);
+
+		if (parseResult.success === false) {
+			return;
+		}
+
+		setEmployeeSettings((currentSettings) => ({
+			...currentSettings,
+			nPerYear: parseResult.data,
+		}));
+	}
+
+	function handleRoundingMethodChange(e: React.ChangeEvent<HTMLSelectElement>) {
+		const parseResult = roundingMethodSchema.safeParse(e.target.value);
+		if (parseResult.success === false) {
+			return;
+		}
+
+		setEmployeeSettings((currentSettings) => ({
+			...currentSettings,
+			roundingMethod: parseResult.data,
+		}));
 	}
 
 	return (
@@ -31,13 +78,16 @@ export default function Home() {
 				<Label>Date de d'entrée en poste</Label>
 				<Input
 					type="date"
-					defaultValue={startDate.toString()}
+					defaultValue={employeeSettings.startDate.toString()}
 					onChange={handleStartDateChange}
 				/>
 			</Field>
 			<Field>
 				<Label>Type de contrat</Label>
-				<Select defaultValue={rttType}>
+				<Select
+					defaultValue={employeeSettings.rttType}
+					onChange={handleRttTypeChange}
+				>
 					<option value="no-rtt">Pas d'heures supplémentaires</option>
 					<option value="35.5h/w">RTT « réels » 35h30</option>
 					<option value="36h/w">RTT « réels » 36h00</option>
@@ -49,7 +99,28 @@ export default function Home() {
 					<option value="218j/an">RTT « forfaitaire » 218 jours</option>
 				</Select>
 			</Field>
-			<Calendar bankHolidayNamePerPlainDateISO={bankHolidays} />
+			<div>
+				<Field>
+					<Label>Nombre de jours de congés par an</Label>
+					<Input
+						type="number"
+						defaultValue={employeeSettings.nPerYear}
+						onChange={handleNPerYearChange}
+					/>
+				</Field>
+				<Field>
+					<Label>Arrondi</Label>
+					<Select
+						defaultValue={employeeSettings.roundingMethod}
+						onChange={handleRoundingMethodChange}
+					>
+						<option value="ceil-int">Arrondi à l'entier supérieur</option>
+						<option value="ceil-half">Arrondi au demi supérieur</option>
+						<option value="round-half">Arrondi au demi</option>
+					</Select>
+				</Field>
+			</div>
+			<Calendar />
 		</div>
 	);
 }

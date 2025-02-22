@@ -1,19 +1,23 @@
 import { Temporal } from "temporal-polyfill";
 import { weekendsDays } from "./helpers/weekends";
 import type { DayOff } from "./day-off";
-import { round, type RoundingMethod } from "./helpers/round";
+import { round } from "./helpers/round";
 import type { EmployeeSettings } from "./employee-settings";
+import { z } from "zod";
 
-export type RttType =
-	| "no-rtt"
-	| "35.5h/w"
-	| "36h/w"
-	| "36.5h/w"
-	| "37h/w"
-	| "37.5h/w"
-	| "38h/w"
-	| "38.5h/w"
-	| "218j/an";
+export const rttTypeSchema = z.union([
+	z.literal("no-rtt"),
+	z.literal("35.5h/w"),
+	z.literal("36h/w"),
+	z.literal("36.5h/w"),
+	z.literal("37h/w"),
+	z.literal("37.5h/w"),
+	z.literal("38h/w"),
+	z.literal("38.5h/w"),
+	z.literal("218j/an"),
+]);
+
+export type RttType = z.infer<typeof rttTypeSchema>;
 
 function isDayOffImpactingRtt(year: number, dayOff: DayOff): boolean {
 	if (dayOff.date.year !== year) {
@@ -39,7 +43,7 @@ export function getRttPerYear(
 		rttType,
 		startDate,
 		daysOff,
-		nOrNMinusOnePerYear = 25,
+		nPerYear = 25,
 		roundingMethod,
 	}: EmployeeSettings,
 ): number {
@@ -51,7 +55,7 @@ export function getRttPerYear(
 	const workedDays =
 		daysInYear -
 		weekends -
-		nOrNMinusOnePerYear -
+		nPerYear -
 		daysOff.filter((dayOff) => isDayOffImpactingRtt(year, dayOff)).length;
 	const regularWorkTime = 35;
 

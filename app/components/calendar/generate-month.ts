@@ -1,13 +1,13 @@
 import { Temporal } from "temporal-polyfill";
-import type { DayOff } from "~/calculator/day-off";
+import type { DayOff } from "~/domain/day-off";
 
-export type Day = {
+export interface Day {
 	date: Temporal.PlainDate;
 	isCurrentMonth: boolean;
 	isToday: boolean;
 	isSelected: boolean;
 	events: DayOff[];
-};
+}
 
 export function startOfWeek(date: Temporal.PlainDate): Temporal.PlainDate {
 	return date.add({ days: -1 * (date.dayOfWeek - 1) });

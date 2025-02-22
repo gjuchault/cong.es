@@ -11,10 +11,20 @@ import { generateCalendar } from "./generate-month";
 import { Temporal } from "temporal-polyfill";
 import { useMemo, useState } from "react";
 import { ClientOnly } from "../client-only";
+import { getDayDetailByDate } from "./get-day-detail-by-date";
+import { useEmployeeSettings } from "~/hooks/use-employee-settings";
+import { round } from "~/domain/helpers/round";
+import { Badge } from "../catalyst/badge";
 
-export function Calendar({
-	bankHolidayNamePerPlainDateISO,
-}: { bankHolidayNamePerPlainDateISO: [string, string][] }) {
+export function Calendar() {
+	const [employeeSettings] = useEmployeeSettings();
+
+	const bankHolidayNamePerPlainDateISO = new Map(
+		employeeSettings.daysOff
+			.filter((dayOff) => dayOff.type === "bank-holiday")
+			.map((dayOff) => [dayOff.date.toString(), dayOff.name] as const),
+	);
+
 	const [yearMonth, setYearMonth] = useState(
 		Temporal.Now.plainDateISO().toPlainYearMonth(),
 	);
@@ -23,7 +33,7 @@ export function Calendar({
 		() =>
 			generateCalendar({
 				yearMonth,
-				bankHolidayNamePerPlainDateISO: new Map(bankHolidayNamePerPlainDateISO),
+				bankHolidayNamePerPlainDateISO,
 			}),
 		[yearMonth, bankHolidayNamePerPlainDateISO],
 	);
@@ -34,6 +44,8 @@ export function Calendar({
 		year: "numeric",
 		calendar: "iso8601",
 	});
+
+	const dayDetailByDate = getDayDetailByDate({ calendar, employeeSettings });
 
 	return (
 		<div className="bg-gray-50 lg:h-0 lg:min-h-[768px]">
@@ -127,28 +139,53 @@ export function Calendar({
 					</div>
 					<div className="flex bg-gray-200 text-xs/6 text-gray-700 lg:flex-auto">
 						<div className="hidden w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
-							{calendar.map((day) => (
-								<div
-									key={day.date.toString()}
-									className={clsx(
-										day.isCurrentMonth
-											? "bg-white"
-											: "bg-gray-50 text-gray-500",
-										"relative px-3 py-2",
-									)}
-								>
-									<time
-										dateTime={day.date.toString()}
-										className={
-											day.isToday
-												? "flex size-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white"
-												: undefined
-										}
+							{calendar.map((day) => {
+								const dayDetail = dayDetailByDate.get(day.date.toString());
+								const n = round(
+									dayDetail?.nAtDate ?? 0,
+									employeeSettings.roundingMethod,
+								);
+								const nMinusOne = round(
+									dayDetail?.nMinusOneAtDate ?? 0,
+									employeeSettings.roundingMethod,
+								);
+								const rtt = round(
+									dayDetail?.rttAtDate ?? 0,
+									employeeSettings.roundingMethod,
+								);
+
+								return (
+									<div
+										key={day.date.toString()}
+										className={clsx(
+											day.isCurrentMonth
+												? "bg-white"
+												: "bg-gray-50 text-gray-500",
+											"relative px-3 py-2",
+											"group",
+										)}
 									>
-										{day.date.toString().split("-").pop()?.replace(/^0/, "")}
-									</time>
-									{day.events.length > 0 && (
+										<time
+											dateTime={day.date.toString()}
+											className={
+												day.isToday
+													? "flex size-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white"
+													: undefined
+											}
+										>
+											{day.date.toString().split("-").pop()?.replace(/^0/, "")}
+										</time>
 										<ol className="mt-2">
+											<li>
+												<Badge color="purple" className="group-hover:hidden">
+													{n + nMinusOne + rtt}
+												</Badge>
+												<div className="hidden group-hover:flex gap-1">
+													<Badge color="emerald">N: {n}</Badge>
+													<Badge color="indigo">N-1: {nMinusOne}</Badge>
+													<Badge color="yellow">RTT: {rtt}</Badge>
+												</div>
+											</li>
 											{day.events.slice(0, 2).map((event) => (
 												<li key={event.type}>
 													<span className="group flex">
@@ -170,9 +207,9 @@ export function Calendar({
 												</li>
 											)}
 										</ol>
-									)}
-								</div>
-							))}
+									</div>
+								);
+							})}
 						</div>
 						<div className="isolate grid w-full grid-cols-7 grid-rows-6 gap-px lg:hidden">
 							{calendar.map((day) => (

@@ -8,8 +8,9 @@ test("getDayDetails", () => {
 		getDayDetails(Temporal.PlainDate.from("2025-04-01"), {
 			rttType: "218j/an",
 			daysOff: bankHolidays,
-			nOrNMinusOnePerYear: 25,
+			nPerYear: 25,
 			startDate: Temporal.PlainDate.from("2025-02-02"),
+			roundingMethod: "ceil-half",
 		}),
 	).toMatchObject({
 		date: Temporal.PlainDate.from("2025-04-01"),
@@ -26,8 +27,9 @@ test("getDayDetails", () => {
 		getDayDetails(Temporal.PlainDate.from("2025-05-05"), {
 			rttType: "218j/an",
 			daysOff: bankHolidays,
-			nOrNMinusOnePerYear: 25,
+			nPerYear: 25,
 			startDate: Temporal.PlainDate.from("2025-02-02"),
+			roundingMethod: "ceil-half",
 		}),
 	).toMatchObject({
 		date: Temporal.PlainDate.from("2025-04-01"),
@@ -44,8 +46,9 @@ test("getDayDetails", () => {
 		getDayDetails(Temporal.PlainDate.from("2025-05-31"), {
 			rttType: "218j/an",
 			daysOff: bankHolidays,
-			nOrNMinusOnePerYear: 25,
+			nPerYear: 25,
 			startDate: Temporal.PlainDate.from("2025-02-02"),
+			roundingMethod: "ceil-half",
 		}),
 	).toMatchObject({
 		date: Temporal.PlainDate.from("2025-04-01"),
@@ -56,5 +59,47 @@ test("getDayDetails", () => {
 		rttDelta: 0,
 		nDelta: expect.closeTo(-8.22),
 		nMinusOneDelta: expect.closeTo(8.22),
+	});
+
+	const firstDate = getDayDetails(Temporal.PlainDate.from("2025-02-01"), {
+		rttType: "218j/an",
+		daysOff: bankHolidays,
+		nPerYear: 25,
+		startDate: Temporal.PlainDate.from("2025-02-01"),
+		roundingMethod: "ceil-half",
+	});
+
+	expect(structuredClone(firstDate)).toMatchObject({
+		date: Temporal.PlainDate.from("2025-02-02"),
+		rttAtDate: 7.5,
+		nAtDate: expect.closeTo(2.05),
+		nMinusOneAtDate: 0,
+
+		rttDelta: expect.closeTo(7.5),
+		nDelta: expect.closeTo(2.05),
+		nMinusOneDelta: 0,
+	});
+
+	expect(
+		getDayDetails(
+			Temporal.PlainDate.from("2025-02-02"),
+			{
+				rttType: "218j/an",
+				daysOff: bankHolidays,
+				nPerYear: 25,
+				startDate: Temporal.PlainDate.from("2025-02-01"),
+				roundingMethod: "ceil-half",
+			},
+			firstDate,
+		),
+	).toMatchObject({
+		date: Temporal.PlainDate.from("2025-02-02"),
+		rttAtDate: 7.5,
+		nAtDate: expect.closeTo(2.05),
+		nMinusOneAtDate: 0,
+
+		rttDelta: 0,
+		nDelta: 0,
+		nMinusOneDelta: 0,
 	});
 });

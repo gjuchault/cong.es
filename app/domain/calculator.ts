@@ -1,11 +1,10 @@
 import { Temporal } from "temporal-polyfill";
 import type { EmployeeSettings } from "./employee-settings";
 import { getRttPerYear, shouldBumpRtt } from "./rtt";
-import { round } from "./helpers/round";
 import { getLastDayOfMonth } from "./helpers/last-day-of-month";
 import { loopBetweenTwoDates } from "./helpers/loop-between-two-dates";
 
-type DayDetail = {
+export interface DayDetail {
 	date: Temporal.PlainDate;
 
 	// Δ
@@ -17,7 +16,7 @@ type DayDetail = {
 	rttAtDate: number;
 	nAtDate: number;
 	nMinusOneAtDate: number;
-};
+}
 
 function getEmployeeStartDayDetails(
 	employeeSettings: EmployeeSettings,
@@ -39,17 +38,29 @@ export function getDayDetails(
 	employeeSettings: EmployeeSettings,
 	lastKnownStatus?: DayDetail,
 ): DayDetail {
+	if (Temporal.PlainDate.compare(date, employeeSettings.startDate) < 0) {
+		return {
+			...getEmployeeStartDayDetails(employeeSettings),
+			date,
+		};
+	}
+
 	const lastStatus =
 		lastKnownStatus ?? getEmployeeStartDayDetails(employeeSettings);
+	const isFirstDateAlreadyPopulated = lastKnownStatus !== undefined;
 
 	const nDaysOffPer30days =
-		((employeeSettings.nOrNMinusOnePerYear ?? 25) / date.daysInYear) * 30;
+		((employeeSettings.nPerYear ?? 25) / date.daysInYear) * 30;
 
 	let rttAtDateIterator = lastStatus.rttAtDate;
 	let nAtDateIterator = lastStatus.nAtDate;
 	let nMinusOneAtDateIterator = lastStatus.nMinusOneAtDate;
 
 	for (const newDay of loopBetweenTwoDates(lastStatus.date, date)) {
+		if (isFirstDateAlreadyPopulated && newDay.equals(lastStatus.date)) {
+			continue;
+		}
+
 		let rttDelta = 0;
 		let nDelta = 0;
 		let nMinusOneDelta = 0;
