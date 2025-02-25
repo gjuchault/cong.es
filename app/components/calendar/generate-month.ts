@@ -5,7 +5,6 @@ export interface Day {
 	date: Temporal.PlainDate;
 	isCurrentMonth: boolean;
 	isToday: boolean;
-	isSelected: boolean;
 	events: DayOff[];
 }
 
@@ -23,11 +22,9 @@ export function isInMonth(
 export function generateCalendar({
 	bankHolidayNamePerPlainDateISO,
 	yearMonth,
-	selectedDay,
 }: {
 	yearMonth: Temporal.PlainYearMonth;
 	bankHolidayNamePerPlainDateISO: Map<string, string>;
-	selectedDay?: Temporal.PlainDate;
 }): Day[] {
 	const startDate = yearMonth.toPlainDate({ day: 1 });
 
@@ -58,7 +55,6 @@ export function generateCalendar({
 			row.push({
 				date: entry,
 				isCurrentMonth,
-				isSelected: selectedDay !== undefined && entry.equals(selectedDay),
 				isToday: entry.equals(Temporal.Now.plainDateISO()),
 				events: [
 					...(bankHoliday

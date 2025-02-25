@@ -1,8 +1,8 @@
 import { Temporal } from "temporal-polyfill";
 import type { EmployeeSettings } from "./employee-settings";
-import { getRttPerYear, shouldBumpRtt } from "./rtt";
 import { getLastDayOfMonth } from "./helpers/last-day-of-month";
 import { loopBetweenTwoDates } from "./helpers/loop-between-two-dates";
+import { getRttPerYear, shouldBumpRtt } from "./rtt";
 
 export interface DayDetail {
 	date: Temporal.PlainDate;

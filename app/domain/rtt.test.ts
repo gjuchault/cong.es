@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { Temporal } from "temporal-polyfill";
-import { getRttPerYear, shouldBumpRtt } from "./rtt";
 import { bankHolidays } from "./helpers/bank-holidays";
+import { getRttPerYear, shouldBumpRtt } from "./rtt";
 
 test("getRttAtDate()", () => {
 	expect(

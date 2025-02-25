@@ -1,9 +1,9 @@
 import { Temporal } from "temporal-polyfill";
-import { weekendsDays } from "./helpers/weekends";
-import type { DayOff } from "./day-off";
-import { round } from "./helpers/round";
-import type { EmployeeSettings } from "./employee-settings";
 import { z } from "zod";
+import type { DayOff } from "./day-off";
+import type { EmployeeSettings } from "./employee-settings";
+import { round } from "./helpers/round";
+import { weekendsDays } from "./helpers/weekends";
 
 export const rttTypeSchema = z.union([
 	z.literal("no-rtt"),

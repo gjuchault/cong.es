@@ -1,12 +1,14 @@
+import { Outlet } from "react-router";
+import { z } from "zod";
 import { Calendar } from "~/components/calendar/calendar";
 import { Field, Label } from "~/components/catalyst/fieldset";
 import { Input } from "~/components/catalyst/input";
 import { Select } from "~/components/catalyst/select";
-import { useEmployeeSettings } from "~/hooks/use-employee-settings";
-import { rttTypeSchema } from "~/domain/rtt";
-import { z } from "zod";
 import { roundingMethodSchema } from "~/domain/helpers/round";
+import { rttTypeSchema } from "~/domain/rtt";
 import { plainDateSchema } from "~/helpers/schemas";
+import { useEmployeeSettings } from "~/hooks/use-employee-settings";
+import type { Route } from "./+types/home";
 
 export function meta() {
 	return [
@@ -15,7 +17,7 @@ export function meta() {
 	];
 }
 
-export default function Home() {
+export default function Home({ params }: Route.LoaderArgs) {
 	const [employeeSettings, setEmployeeSettings] = useEmployeeSettings();
 
 	function handleStartDateChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -74,6 +76,7 @@ export default function Home() {
 
 	return (
 		<div>
+			<Outlet />
 			<Field>
 				<Label>Date de d'entrée en poste</Label>
 				<Input
@@ -120,7 +123,7 @@ export default function Home() {
 					</Select>
 				</Field>
 			</div>
-			<Calendar />
+			<Calendar params={params} />
 		</div>
 	);
 }

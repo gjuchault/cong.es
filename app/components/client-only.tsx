@@ -1,4 +1,4 @@
-import { useSyncExternalStore, type PropsWithChildren } from "react";
+import { type PropsWithChildren, useSyncExternalStore } from "react";
 
 function subscribe() {
 	return () => {};

@@ -1,9 +1,9 @@
 import { Temporal } from "temporal-polyfill";
-import { rttTypeSchema } from "./rtt";
-import { dayOffSchema } from "./day-off";
-import { roundingMethodSchema } from "./helpers/round";
 import { z } from "zod";
+import { dayOffSchema } from "./day-off";
 import { bankHolidays } from "./helpers/bank-holidays";
+import { roundingMethodSchema } from "./helpers/round";
+import { rttTypeSchema } from "./rtt";
 
 export const employeeSettingsSchema = z.object({
 	rttType: rttTypeSchema,

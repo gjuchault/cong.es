@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { getDayDetails } from "./calculator";
 import { Temporal } from "temporal-polyfill";
+import { getDayDetails } from "./calculator";
 import { bankHolidays } from "./helpers/bank-holidays";
 
 test("getDayDetails", () => {

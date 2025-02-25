@@ -1,51 +1,31 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
-	ChevronDownIcon,
 	ChevronLeftIcon,
 	ChevronRightIcon,
-	ClockIcon,
 	EllipsisHorizontalIcon,
 } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
-import { generateCalendar } from "./generate-month";
+import { useNavigate } from "react-router";
 import { Temporal } from "temporal-polyfill";
-import { useMemo, useState } from "react";
-import { ClientOnly } from "../client-only";
-import { getDayDetailByDate } from "./get-day-detail-by-date";
-import { useEmployeeSettings } from "~/hooks/use-employee-settings";
-import { round } from "~/domain/helpers/round";
 import { Badge } from "../catalyst/badge";
+import { ClientOnly } from "../client-only";
+import { useCalendar } from "./use-calendar";
 
-export function Calendar() {
-	const [employeeSettings] = useEmployeeSettings();
-
-	const bankHolidayNamePerPlainDateISO = new Map(
-		employeeSettings.daysOff
-			.filter((dayOff) => dayOff.type === "bank-holiday")
-			.map((dayOff) => [dayOff.date.toString(), dayOff.name] as const),
-	);
-
-	const [yearMonth, setYearMonth] = useState(
-		Temporal.Now.plainDateISO().toPlainYearMonth(),
-	);
-
-	const calendar = useMemo(
-		() =>
-			generateCalendar({
-				yearMonth,
-				bankHolidayNamePerPlainDateISO,
-			}),
-		[yearMonth, bankHolidayNamePerPlainDateISO],
-	);
-	const selectedDay = calendar.find((day) => day.isSelected);
+export function Calendar({
+	params,
+}: {
+	params: {
+		from?: string;
+		to?: string;
+	};
+}) {
+	const { yearMonth, setYearMonth, calendar } = useCalendar(params);
 
 	const yearMonthAsString = yearMonth.toLocaleString("fr", {
 		month: "long",
 		year: "numeric",
 		calendar: "iso8601",
 	});
-
-	const dayDetailByDate = getDayDetailByDate({ calendar, employeeSettings });
 
 	return (
 		<div className="bg-gray-50 lg:h-0 lg:min-h-[768px]">
@@ -138,22 +118,9 @@ export function Calendar() {
 						</div>
 					</div>
 					<div className="flex bg-gray-200 text-xs/6 text-gray-700 lg:flex-auto">
-						<div className="hidden w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
+						<div className="w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
 							{calendar.map((day) => {
-								const dayDetail = dayDetailByDate.get(day.date.toString());
-								const n = round(
-									dayDetail?.nAtDate ?? 0,
-									employeeSettings.roundingMethod,
-								);
-								const nMinusOne = round(
-									dayDetail?.nMinusOneAtDate ?? 0,
-									employeeSettings.roundingMethod,
-								);
-								const rtt = round(
-									dayDetail?.rttAtDate ?? 0,
-									employeeSettings.roundingMethod,
-								);
-
+								console.log(day.date.toString(), day);
 								return (
 									<div
 										key={day.date.toString()}
@@ -163,7 +130,11 @@ export function Calendar() {
 												: "bg-gray-50 text-gray-500",
 											"relative px-3 py-2",
 											"group",
+											"select-none",
 										)}
+										onMouseDown={day.onMouseDown}
+										onMouseMove={day.onMouseMove}
+										onMouseUp={day.onMouseUp}
 									>
 										<time
 											dateTime={day.date.toString()}
@@ -173,122 +144,65 @@ export function Calendar() {
 													: undefined
 											}
 										>
-											{day.date.toString().split("-").pop()?.replace(/^0/, "")}
+											{day.date.day.toString()}
 										</time>
-										<ol className="mt-2">
-											<li>
-												<Badge color="purple" className="group-hover:hidden">
-													{n + nMinusOne + rtt}
-												</Badge>
-												<div className="hidden group-hover:flex gap-1">
-													<Badge color="emerald">N: {n}</Badge>
-													<Badge color="indigo">N-1: {nMinusOne}</Badge>
-													<Badge color="yellow">RTT: {rtt}</Badge>
-												</div>
-											</li>
-											{day.events.slice(0, 2).map((event) => (
-												<li key={event.type}>
-													<span className="group flex">
-														<p className="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">
-															{event.name}
-														</p>
-														<time
-															dateTime={event.type}
-															className="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block"
-														>
-															{event.type}
-														</time>
-													</span>
-												</li>
-											))}
-											{day.events.length > 2 && (
-												<li className="text-gray-500">
-													+ {day.events.length - 2} more
-												</li>
-											)}
-										</ol>
+										<div>
+											<Badge color="purple" className="group-hover:hidden">
+												{day.n + day.nMinusOne + day.rtt}
+											</Badge>
+											<div className="hidden group-hover:flex gap-1">
+												<Badge color="emerald">N: {day.n}</Badge>
+												<Badge color="indigo">N-1: {day.nMinusOne}</Badge>
+												<Badge color="yellow">RTT: {day.rtt}</Badge>
+											</div>
+										</div>
+										{day.isDaySelected && (
+											<Badge
+												color="blue"
+												className={clsx("block!", {
+													"rounded-md m-0":
+														day.isFirstOfSelection === true &&
+														day.isLastOfSelection === true,
+													"rounded-l-md rounded-r-none -mr-3":
+														day.isFirstOfSelection === true &&
+														day.isLastOfSelection === false,
+													"rounded-r-md rounded-l-none -ml-3":
+														day.isFirstOfSelection === false &&
+														day.isLastOfSelection === true,
+													"rounded-none -mr-3 -ml-3":
+														day.isFirstOfSelection === false &&
+														day.isLastOfSelection === false,
+													"text-transparent!":
+														(day.isFirstOfSelection === true &&
+															day.isLastOfSelection === false) ||
+														day.isLastOfSelection === false,
+													"text-right":
+														day.isLastOfSelection === true &&
+														day.isFirstOfSelection === false,
+												})}
+											>
+												Ajouter des congés
+											</Badge>
+										)}
+										{day.events.map((event) => (
+											<span className="group flex" key={event.type}>
+												<p className="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">
+													{event.name}
+												</p>
+												<time
+													dateTime={event.type}
+													className="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block"
+												>
+													{event.type}
+												</time>
+											</span>
+										))}
 									</div>
 								);
 							})}
 						</div>
-						<div className="isolate grid w-full grid-cols-7 grid-rows-6 gap-px lg:hidden">
-							{calendar.map((day) => (
-								<button
-									key={day.date.toString()}
-									type="button"
-									className={clsx(
-										day.isCurrentMonth ? "bg-white" : "bg-gray-50",
-										(day.isSelected || day.isToday) && "font-semibold",
-										day.isSelected && "text-white",
-										!day.isSelected && day.isToday && "text-indigo-600",
-										!day.isSelected &&
-											day.isCurrentMonth &&
-											!day.isToday &&
-											"text-gray-900",
-										!day.isSelected &&
-											!day.isCurrentMonth &&
-											!day.isToday &&
-											"text-gray-500",
-										"flex h-14 flex-col px-3 py-2 hover:bg-gray-100 focus:z-10",
-									)}
-								>
-									<time
-										dateTime={day.date.toString()}
-										className={clsx(
-											day.isSelected &&
-												"flex size-6 items-center justify-center rounded-full",
-											day.isSelected && day.isToday && "bg-indigo-600",
-											day.isSelected && !day.isToday && "bg-gray-900",
-											"ml-auto",
-										)}
-									>
-										{day.date.toString().split("-").pop()?.replace(/^0/, "")}
-									</time>
-									<span className="sr-only">{day.events.length} events</span>
-									{day.events.length > 0 && (
-										<span className="-mx-0.5 mt-auto flex flex-wrap-reverse">
-											{day.events.map((event) => (
-												<span
-													key={event.type}
-													className="mx-0.5 mb-1 size-1.5 rounded-full bg-gray-400"
-												/>
-											))}
-										</span>
-									)}
-								</button>
-							))}
-						</div>
 					</div>
 				</div>
-				{(selectedDay?.events.length ?? 0) > 0 && (
-					<div className="px-4 py-10 sm:px-6 lg:hidden">
-						<ol className="divide-y divide-gray-100 overflow-hidden rounded-lg bg-white text-sm ring-1 shadow-sm ring-black/5">
-							{selectedDay?.events.map((event) => (
-								<li
-									key={event.type}
-									className="group flex p-4 pr-6 focus-within:bg-gray-50 hover:bg-gray-50"
-								>
-									<div className="flex-auto">
-										<p className="font-semibold text-gray-900">{event.type}</p>
-										<time
-											dateTime={event.type}
-											className="mt-2 flex items-center text-gray-700"
-										>
-											<ClockIcon
-												className="mr-2 size-5 text-gray-400"
-												aria-hidden="true"
-											/>
-											{event.type}
-										</time>
-									</div>
-									<span className="ml-6 flex-none self-center rounded-md bg-white px-3 py-2 font-semibold text-gray-900 opacity-0 ring-1 shadow-xs ring-gray-300 ring-inset group-hover:opacity-100 hover:ring-gray-400 focus:opacity-100">
-										Edit<span className="sr-only">, {event.type}</span>
-									</span>
-								</li>
-							))}
-						</ol>
-					</div>
-				)}
 			</div>
 		</div>
 	);
