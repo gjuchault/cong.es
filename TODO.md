@@ -8,3 +8,7 @@
 - [x] Afficher la somme des N-1 sur le calendrier
 - [x] Calcul du meilleur choix
 - [ ] Gestion du stock perdu
+- [ ] Settings en modal
+- [ ] Half days
+- [ ] Dark mode calendar
+- [x] Publish on github

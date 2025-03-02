@@ -1,12 +1,12 @@
 import { Temporal } from "temporal-polyfill";
-import type { Day, DaysOff, ExpandedDayOff } from "./day";
+import type { Day, DaysOff } from "./day";
 import { expandDaysOff } from "./expand-days-off";
 
-export function startOfWeek(date: Temporal.PlainDate): Temporal.PlainDate {
+function startOfWeek(date: Temporal.PlainDate): Temporal.PlainDate {
 	return date.add({ days: -1 * (date.dayOfWeek - 1) });
 }
 
-export function isInMonth(
+function isInMonth(
 	date: Temporal.PlainDate,
 	yearMonth: Temporal.PlainYearMonth,
 ): boolean {

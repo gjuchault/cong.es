@@ -3,6 +3,7 @@ import type { EmployeeSettings } from "./employee-settings";
 import { getLastDayOfMonth } from "./helpers/last-day-of-month";
 import { loopBetweenTwoDates } from "./helpers/loop-between-two-dates";
 import { getRttPerMonth } from "./rtt";
+import { getWorkingDays } from "./get-working-days";
 
 export interface DayDetail {
 	date: Temporal.PlainDate;
@@ -57,6 +58,13 @@ export function getDayDetails(
 	let nAtDateIterator = lastStatus.nAtDate;
 	let nMinusOneAtDateIterator = lastStatus.nMinusOneAtDate;
 
+	const daysOffByFrom = new Map(
+		employeeSettings.daysOff.map((dayOff) => [
+			dayOff.from.toString(),
+			dayOff,
+		]),
+	)
+
 	for (const newDay of loopBetweenTwoDates(lastStatus.date, date)) {
 		if (isFirstDateAlreadyPopulated && newDay.equals(lastStatus.date)) {
 			continue;
@@ -84,6 +92,32 @@ export function getDayDetails(
 				// add N
 				nAtDateIterator;
 			nDelta = -1 * nAtDateIterator; // stock.n
+		}
+
+		const dayOff = daysOffByFrom.get(newDay.toString())
+		if (dayOff !== undefined) {
+			const quantity = getWorkingDays({
+				from: dayOff.from,
+				to: dayOff.to,
+				startHalf: false,
+				stopHalf: false,
+			});
+
+			switch (dayOff.type) {
+				case "bankHoliday":
+					break;
+				case "n":
+					nDelta -= quantity
+					break;
+				case "nMinusOne":
+					nDelta -= quantity
+					break;
+				case "rtt":
+					rttDelta -= quantity;
+					break;
+				default:
+					throw new Error(`Unknown day off type: ${dayOff.type satisfies never}`);
+			}
 		}
 
 		rttAtDateIterator += rttDelta;

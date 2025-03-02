@@ -89,7 +89,7 @@ export function getRttPerMonth(
 		case "no-rtt":
 			break;
 		default:
-			break;
+			throw new Error(`Unknown RTT type: ${rttType satisfies never}`);
 	}
 
 	// Apparently, 218j/an is not impacted by pro-rata

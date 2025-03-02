@@ -30,6 +30,8 @@ export function round(
 		case "double-digit":
 			value = Math.round(input * 100) / 100;
 			break;
+		default:
+			throw new Error(`Unknown rounding method: ${roundingMethod satisfies never}`);
 	}
 
 	return safe(value);
