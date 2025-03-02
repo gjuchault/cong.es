@@ -1,6 +1,6 @@
-import { type DayDetail, getDayDetails } from "~/domain/calculator";
-import type { EmployeeSettings } from "~/domain/employee-settings";
-import type { Day } from "./generate-month";
+import { type DayDetail, getDayDetails } from "./get-day-details";
+import type { EmployeeSettings } from "./employee-settings";
+import type { Day } from "./day";
 
 export function getDayDetailByDate({
 	calendar,

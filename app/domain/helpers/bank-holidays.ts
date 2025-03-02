@@ -1,12 +1,15 @@
 import { Temporal } from "temporal-polyfill";
 import rawBankHolidays from "../../../static-data/bank-holidays.json";
-import type { DayOff } from "../day-off";
+import type { DaysOff } from "../day";
 
 export const bankHolidays = rawBankHolidays.map(
 	([date, name]) =>
 		({
-			date: Temporal.PlainDate.from(date),
-			type: "bank-holiday",
+			from: Temporal.PlainDate.from(date),
+			to: Temporal.PlainDate.from(date),
+			fromHalfOnly: false,
+			toHalfOnly: false,
+			type: "bankHoliday",
 			name,
-		}) satisfies DayOff,
+		}) satisfies DaysOff,
 );

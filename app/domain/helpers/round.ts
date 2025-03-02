@@ -1,9 +1,11 @@
 import { z } from "zod";
+import { safe } from "./safe";
 
 export const roundingMethodSchema = z.union([
 	z.literal("ceil-int"),
 	z.literal("ceil-half"),
 	z.literal("round-half"),
+	z.literal("double-digit")
 ]);
 export type RoundingMethod = z.infer<typeof roundingMethodSchema>;
 
@@ -13,12 +15,22 @@ export function round(
 ): number {
 	const roundingMethod = roundingMethodOrUndefined ?? "ceil-half";
 
+	let value: number;
+
 	switch (roundingMethod) {
 		case "ceil-int":
-			return Math.ceil(input);
+			value = Math.ceil(input);
+			break;
 		case "ceil-half":
-			return Math.ceil(input * 2) / 2;
+			value = Math.ceil(input * 2) / 2;
+			break;
 		case "round-half":
-			return Math.round(input * 2) / 2;
+			value = Math.round(input * 2) / 2;
+			break;
+		case "double-digit":
+			value = Math.round(input * 100) / 100;
+			break;
 	}
+
+	return safe(value);
 }

@@ -1,12 +1,12 @@
 import { Temporal } from "temporal-polyfill";
 
-export function isDateBetween(
+export function isDateBetweenIncl(
 	date: Temporal.PlainDate,
 	left: Temporal.PlainDate,
 	right: Temporal.PlainDate,
 ): boolean {
 	if (Temporal.PlainDate.compare(left, right) > 0) {
-		return isDateBetween(date, right, left);
+		return isDateBetweenIncl(date, right, left);
 	}
 
 	return (

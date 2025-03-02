@@ -1,9 +1,11 @@
 import { Temporal } from "temporal-polyfill";
 import { z } from "zod";
-import type { DayOff } from "./day-off";
+import type { DaysOff, ExpandedDayOff } from "./day";
 import type { EmployeeSettings } from "./employee-settings";
 import { round } from "./helpers/round";
 import { weekendsDays } from "./helpers/weekends";
+import { expandDaysOff } from "./expand-days-off";
+import { bankHolidays } from "./helpers/bank-holidays";
 
 export const rttTypeSchema = z.union([
 	z.literal("no-rtt"),
@@ -19,25 +21,25 @@ export const rttTypeSchema = z.union([
 
 export type RttType = z.infer<typeof rttTypeSchema>;
 
-function isDayOffImpactingRtt(year: number, dayOff: DayOff): boolean {
-	if (dayOff.date.year !== year) {
+function isDayOffImpactingRtt(year: number, dayOff: Pick<DaysOff, "from" | "type">): boolean {
+	if (dayOff.from.year !== year) {
 		return false;
 	}
 
 	// N and N-1 are counting, as a total bucket, not as individual days that were
 	// took off
-	if (dayOff.type !== "bank-holiday") {
+	if (dayOff.type !== "bankHoliday") {
 		return false;
 	}
 
-	if (dayOff.date.dayOfWeek === 6 || dayOff.date.dayOfWeek === 7) {
+	if (dayOff.from.dayOfWeek === 6 || dayOff.from.dayOfWeek === 7) {
 		return false;
 	}
 
 	return true;
 }
 
-export function getRttPerYear(
+export function getRttPerMonth(
 	year: number,
 	{
 		rttType,
@@ -56,7 +58,7 @@ export function getRttPerYear(
 		daysInYear -
 		weekends -
 		nPerYear -
-		daysOff.filter((dayOff) => isDayOffImpactingRtt(year, dayOff)).length;
+		bankHolidays.filter((dayOff) => isDayOffImpactingRtt(year, dayOff)).length;
 	const regularWorkTime = 35;
 
 	switch (rttType) {
@@ -90,22 +92,13 @@ export function getRttPerYear(
 			break;
 	}
 
-	if (startDate.year === year) {
+	// Apparently, 218j/an is not impacted by pro-rata
+	if (startDate.year === year && rttType !== "218j/an") {
 		const proRata =
 			(startDate.daysInYear - startDate.dayOfYear) / startDate.daysInYear;
-		return round(rttPerYear * proRata, roundingMethod);
+		return round((rttPerYear * proRata) / 12, roundingMethod);
 	}
 
-	return round(rttPerYear, roundingMethod);
-}
 
-export function shouldBumpRtt(
-	date: Temporal.PlainDate,
-	employeeSettings: EmployeeSettings,
-): boolean {
-	if (date.year === employeeSettings.startDate.year) {
-		return date.equals(employeeSettings.startDate);
-	}
-
-	return date.dayOfYear === 1;
+	return round(rttPerYear / 12, roundingMethod);
 }

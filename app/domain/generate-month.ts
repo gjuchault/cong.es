@@ -1,12 +1,6 @@
 import { Temporal } from "temporal-polyfill";
-import type { DayOff } from "~/domain/day-off";
-
-export interface Day {
-	date: Temporal.PlainDate;
-	isCurrentMonth: boolean;
-	isToday: boolean;
-	events: DayOff[];
-}
+import type { Day, DaysOff, ExpandedDayOff } from "./day";
+import { expandDaysOff } from "./expand-days-off";
 
 export function startOfWeek(date: Temporal.PlainDate): Temporal.PlainDate {
 	return date.add({ days: -1 * (date.dayOfWeek - 1) });
@@ -22,9 +16,11 @@ export function isInMonth(
 export function generateCalendar({
 	bankHolidayNamePerPlainDateISO,
 	yearMonth,
+	daysOff,
 }: {
 	yearMonth: Temporal.PlainYearMonth;
 	bankHolidayNamePerPlainDateISO: Map<string, string>;
+	daysOff: DaysOff[]
 }): Day[] {
 	const startDate = yearMonth.toPlainDate({ day: 1 });
 
@@ -33,6 +29,13 @@ export function generateCalendar({
 	const rows: Day[][] = [];
 	let startedMonth = false;
 	let baseDaysToAdd = 0;
+
+	const allExpandedDaysOffByDate = new Map(
+		daysOff.flatMap((dayOff) => expandDaysOff(dayOff)).map((dayOff) => [
+			dayOff.date.toString(),
+			dayOff,
+		]),
+	);
 
 	while (true) {
 		const row: Day[] = [];
@@ -50,23 +53,40 @@ export function generateCalendar({
 				wentOverMonth = true;
 			}
 
+			const events: Day["events"] = [];
+
 			const bankHoliday = bankHolidayNamePerPlainDateISO.get(entry.toString());
+			if (bankHoliday !== undefined) {
+				events.push({
+					date: entry,
+					type: "bankHoliday",
+					isStart: true,
+					isEnd: true,
+					label: bankHoliday,
+					fromHalfOnly: false,
+					toHalfOnly: false,
+				})
+			}
+
+			const expandedDayOff = allExpandedDaysOffByDate.get(entry.toString());
+			if (expandedDayOff !== undefined) {
+				events.push({
+					date: entry,
+					type: expandedDayOff.type,
+					isStart: expandedDayOff.isStart,
+					isEnd: expandedDayOff.isEnd,
+					label: expandedDayOff.label,
+					fromHalfOnly: expandedDayOff.fromHalfOnly,
+					toHalfOnly: expandedDayOff.toHalfOnly,
+				})
+			}
+
 
 			row.push({
 				date: entry,
 				isCurrentMonth,
 				isToday: entry.equals(Temporal.Now.plainDateISO()),
-				events: [
-					...(bankHoliday
-						? [
-								{
-									date: entry,
-									type: "bank-holiday",
-									name: bankHoliday,
-								} satisfies DayOff,
-							]
-						: []),
-				],
+				events,
 			});
 
 			baseDaysToAdd += 1;

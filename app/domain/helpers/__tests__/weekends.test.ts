@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { weekendsDays } from "./weekends";
+import { weekendsDays } from "../weekends";
 
 test("weekendDays()", () => {
 	expect(weekendsDays(2025)).toBe(104);

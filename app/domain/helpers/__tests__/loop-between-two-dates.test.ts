@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { Temporal } from "temporal-polyfill";
-import { loopBetweenTwoDates } from "./loop-between-two-dates";
+import { loopBetweenTwoDates } from "../loop-between-two-dates";
 
 test("loopBetweenTwoDates()", () => {
 	const start = Temporal.PlainDate.from("2022-01-25");

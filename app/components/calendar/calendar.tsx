@@ -5,11 +5,13 @@ import {
 	EllipsisHorizontalIcon,
 } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
-import { useNavigate } from "react-router";
 import { Temporal } from "temporal-polyfill";
 import { Badge } from "../catalyst/badge";
 import { ClientOnly } from "../client-only";
 import { useCalendar } from "./use-calendar";
+import { safe } from "~/domain/helpers/safe";
+import { MultiDayBadge } from "./multi-day-badge";
+import { dayOffTypeColor } from "~/domain/day";
 
 export function Calendar({
 	params,
@@ -120,7 +122,6 @@ export function Calendar({
 					<div className="flex bg-gray-200 text-xs/6 text-gray-700 lg:flex-auto">
 						<div className="w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
 							{calendar.map((day) => {
-								console.log(day.date.toString(), day);
 								return (
 									<div
 										key={day.date.toString()}
@@ -148,55 +149,51 @@ export function Calendar({
 										</time>
 										<div>
 											<Badge color="purple" className="group-hover:hidden">
-												{day.n + day.nMinusOne + day.rtt}
+												{safe(day.n + day.nMinusOne + day.rtt)}
 											</Badge>
 											<div className="hidden group-hover:flex gap-1">
-												<Badge color="emerald">N: {day.n}</Badge>
-												<Badge color="indigo">N-1: {day.nMinusOne}</Badge>
-												<Badge color="yellow">RTT: {day.rtt}</Badge>
+												<Badge color={dayOffTypeColor.n}>N: {day.n}</Badge>
+												<Badge color={dayOffTypeColor.nMinusOne}>
+													N-1: {day.nMinusOne}
+												</Badge>
+												<Badge color={dayOffTypeColor.rtt}>
+													RTT: {day.rtt}
+												</Badge>
 											</div>
 										</div>
 										{day.isDaySelected && (
-											<Badge
+											<MultiDayBadge
 												color="blue"
-												className={clsx("block!", {
-													"rounded-md m-0":
-														day.isFirstOfSelection === true &&
-														day.isLastOfSelection === true,
-													"rounded-l-md rounded-r-none -mr-3":
-														day.isFirstOfSelection === true &&
-														day.isLastOfSelection === false,
-													"rounded-r-md rounded-l-none -ml-3":
-														day.isFirstOfSelection === false &&
-														day.isLastOfSelection === true,
-													"rounded-none -mr-3 -ml-3":
-														day.isFirstOfSelection === false &&
-														day.isLastOfSelection === false,
-													"text-transparent!":
-														(day.isFirstOfSelection === true &&
-															day.isLastOfSelection === false) ||
-														day.isLastOfSelection === false,
-													"text-right":
-														day.isLastOfSelection === true &&
-														day.isFirstOfSelection === false,
-												})}
+												isFirst={day.isFirstOfSelection}
+												isLast={day.isLastOfSelection}
 											>
 												Ajouter des congés
-											</Badge>
+											</MultiDayBadge>
 										)}
-										{day.events.map((event) => (
-											<span className="group flex" key={event.type}>
+										{day.hasDayOff && (
+											<MultiDayBadge
+												color={dayOffTypeColor[day.type]}
+												isFirst={day.isFirstOff}
+												isLast={day.isLastOff}
+											>
+												{day.label.length > 0
+													? day.label
+													: `Congés (${day.type})`}
+											</MultiDayBadge>
+										)}
+										{day.bankHoliday !== undefined && (
+											<span
+												className="group flex"
+												key={day.bankHoliday.date.toString()}
+											>
 												<p className="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">
-													{event.name}
+													{day.bankHoliday.label}
 												</p>
-												<time
-													dateTime={event.type}
-													className="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block"
-												>
-													{event.type}
-												</time>
+												<span className="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block">
+													{day.bankHoliday.type}
+												</span>
 											</span>
-										))}
+										)}
 									</div>
 								);
 							})}

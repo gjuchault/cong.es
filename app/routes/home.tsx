@@ -1,4 +1,3 @@
-import { Outlet } from "react-router";
 import { z } from "zod";
 import { Calendar } from "~/components/calendar/calendar";
 import { Field, Label } from "~/components/catalyst/fieldset";
@@ -9,6 +8,7 @@ import { rttTypeSchema } from "~/domain/rtt";
 import { plainDateSchema } from "~/helpers/schemas";
 import { useEmployeeSettings } from "~/hooks/use-employee-settings";
 import type { Route } from "./+types/home";
+import { AddDayOff } from "~/components/add-day-off/add-day-off";
 
 export function meta() {
 	return [
@@ -76,21 +76,20 @@ export default function Home({ params }: Route.LoaderArgs) {
 
 	return (
 		<div>
-			<Outlet />
+			{params.from !== undefined && params.to !== undefined && (
+				<AddDayOff from={params.from} to={params.to} />
+			)}
 			<Field>
 				<Label>Date de d'entrée en poste</Label>
 				<Input
 					type="date"
-					defaultValue={employeeSettings.startDate.toString()}
+					value={employeeSettings.startDate.toString()}
 					onChange={handleStartDateChange}
 				/>
 			</Field>
 			<Field>
 				<Label>Type de contrat</Label>
-				<Select
-					defaultValue={employeeSettings.rttType}
-					onChange={handleRttTypeChange}
-				>
+				<Select value={employeeSettings.rttType} onChange={handleRttTypeChange}>
 					<option value="no-rtt">Pas d'heures supplémentaires</option>
 					<option value="35.5h/w">RTT « réels » 35h30</option>
 					<option value="36h/w">RTT « réels » 36h00</option>
@@ -107,19 +106,20 @@ export default function Home({ params }: Route.LoaderArgs) {
 					<Label>Nombre de jours de congés par an</Label>
 					<Input
 						type="number"
-						defaultValue={employeeSettings.nPerYear}
+						value={employeeSettings.nPerYear}
 						onChange={handleNPerYearChange}
 					/>
 				</Field>
 				<Field>
 					<Label>Arrondi</Label>
 					<Select
-						defaultValue={employeeSettings.roundingMethod}
+						value={employeeSettings.roundingMethod}
 						onChange={handleRoundingMethodChange}
 					>
 						<option value="ceil-int">Arrondi à l'entier supérieur</option>
 						<option value="ceil-half">Arrondi au demi supérieur</option>
 						<option value="round-half">Arrondi au demi</option>
+						<option value="double-digit">Deux décimales</option>
 					</Select>
 				</Field>
 			</div>

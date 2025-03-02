@@ -1,11 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { Temporal } from "temporal-polyfill";
 import { round } from "~/domain/helpers/round";
-import { isDateBetween } from "~/helpers/date";
+import { isDateBetweenIncl } from "~/helpers/date";
 import { useEmployeeSettings } from "~/hooks/use-employee-settings";
-import { generateCalendar } from "./generate-month";
-import { getDayDetailByDate } from "./get-day-detail-by-date";
+import { generateCalendar } from "~/domain/generate-month";
+import { getDayDetailByDate } from "~/domain/get-day-detail-by-date";
+import { bankHolidays } from "~/domain/helpers/bank-holidays";
+
+const bankHolidayNamePerPlainDateISO = new Map(
+	bankHolidays
+		.map((dayOff) => [dayOff.from.toString(), dayOff.name] as const),
+);
 
 export function useCalendar({
 	from,
@@ -32,18 +38,15 @@ export function useCalendar({
 			return undefined;
 		}
 	});
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: meant to reset state
+	useEffect(() => {
+		setStartDaySelected(undefined);
+		setEndDaySelected(undefined);
+	}, [from, to]);
+
 	const [isSelectionInitial, setIsSelectionInitial] = useState(true);
 	const [employeeSettings] = useEmployeeSettings();
-
-	const bankHolidayNamePerPlainDateISO = useMemo(
-		() =>
-			new Map(
-				employeeSettings.daysOff
-					.filter((dayOff) => dayOff.type === "bank-holiday")
-					.map((dayOff) => [dayOff.date.toString(), dayOff.name] as const),
-			),
-		[employeeSettings],
-	);
 
 	const [yearMonth, setYearMonth] = useState(
 		Temporal.Now.plainDateISO().toPlainYearMonth(),
@@ -54,8 +57,9 @@ export function useCalendar({
 			generateCalendar({
 				yearMonth,
 				bankHolidayNamePerPlainDateISO,
+				daysOff: employeeSettings.daysOff
 			}),
-		[yearMonth, bankHolidayNamePerPlainDateISO],
+		[yearMonth, employeeSettings.daysOff],
 	);
 	const navigate = useNavigate();
 
@@ -83,23 +87,37 @@ export function useCalendar({
 				const isDaySelected =
 					startDaySelected !== undefined &&
 					endDaySelected !== undefined &&
-					isDateBetween(day.date, startDaySelected, endDaySelected);
+					isDateBetweenIncl(day.date, startDaySelected, endDaySelected);
 
 				const isFirstOfSelection =
 					isDaySelected && startDaySelected.equals(day.date);
 				const isLastOfSelection =
 					isDaySelected && endDaySelected.equals(day.date);
 
+				const dayOff = day.events.filter((event) => event.type !== "bankHoliday").at(0);
+				const dayOffProps = dayOff ? {
+					hasDayOff: true,
+					type: dayOff.type,
+					label: dayOff.label,
+					isFirstOff: dayOff.isStart,
+					isLastOff: dayOff.isEnd,
+				} as const : {
+					hasDayOff: false,
+				} as const;
+
 				return {
-					...day,
-					isDaySelected,
+					date: day.date,
+					isCurrentMonth: day.isCurrentMonth,
+					isToday: day.isToday,
+					...dayOffProps,
+					bankHoliday: day.events.filter((event) => event.type === "bankHoliday").at(0),
 					n,
 					nMinusOne,
 					rtt,
+					isDaySelected,
 					isFirstOfSelection,
 					isLastOfSelection,
 					onMouseDown() {
-						console.log("mouse down");
 						setIsSelectionInitial(false);
 						setStartDaySelected(day.date);
 						setEndDaySelected(undefined);

@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { Temporal } from "temporal-polyfill";
-import { getDayDetails } from "./calculator";
-import { bankHolidays } from "./helpers/bank-holidays";
+import { getDayDetails } from "../get-day-details";
+import { bankHolidays } from "../helpers/bank-holidays";
 
 test("getDayDetails", () => {
 	expect(
@@ -14,7 +14,7 @@ test("getDayDetails", () => {
 		}),
 	).toMatchObject({
 		date: Temporal.PlainDate.from("2025-04-01"),
-		rttAtDate: 7.5,
+		rttAtDate: 2,
 		nAtDate: expect.closeTo(4.11),
 		nMinusOneAtDate: 0,
 
@@ -33,7 +33,7 @@ test("getDayDetails", () => {
 		}),
 	).toMatchObject({
 		date: Temporal.PlainDate.from("2025-04-01"),
-		rttAtDate: 7.5,
+		rttAtDate: 4,
 		nAtDate: expect.closeTo(8.22),
 		nMinusOneAtDate: 0,
 
@@ -52,7 +52,7 @@ test("getDayDetails", () => {
 		}),
 	).toMatchObject({
 		date: Temporal.PlainDate.from("2025-04-01"),
-		rttAtDate: 7.5,
+		rttAtDate: 4,
 		nAtDate: 0,
 		nMinusOneAtDate: expect.closeTo(8.22),
 
@@ -71,11 +71,11 @@ test("getDayDetails", () => {
 
 	expect(structuredClone(firstDate)).toMatchObject({
 		date: Temporal.PlainDate.from("2025-02-02"),
-		rttAtDate: 7.5,
+		rttAtDate: 1,
 		nAtDate: expect.closeTo(2.05),
 		nMinusOneAtDate: 0,
 
-		rttDelta: expect.closeTo(7.5),
+		rttDelta: expect.closeTo(1),
 		nDelta: expect.closeTo(2.05),
 		nMinusOneDelta: 0,
 	});
@@ -94,7 +94,7 @@ test("getDayDetails", () => {
 		),
 	).toMatchObject({
 		date: Temporal.PlainDate.from("2025-02-02"),
-		rttAtDate: 7.5,
+		rttAtDate: 1,
 		nAtDate: expect.closeTo(2.05),
 		nMinusOneAtDate: 0,
 

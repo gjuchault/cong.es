@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { Temporal } from "temporal-polyfill";
-import { getLastDayOfMonth } from "./last-day-of-month";
+import { getLastDayOfMonth } from "../last-day-of-month";
 
 test("getLastDayOfMonth()", () => {
 	expect(

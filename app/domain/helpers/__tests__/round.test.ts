@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { round } from "./round";
+import { round } from "../round";
 
 test("round()", () => {
 	expect(round(2, "ceil-int")).toBe(2);

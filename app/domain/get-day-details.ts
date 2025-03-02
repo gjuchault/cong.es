@@ -2,7 +2,7 @@ import { Temporal } from "temporal-polyfill";
 import type { EmployeeSettings } from "./employee-settings";
 import { getLastDayOfMonth } from "./helpers/last-day-of-month";
 import { loopBetweenTwoDates } from "./helpers/loop-between-two-dates";
-import { getRttPerYear, shouldBumpRtt } from "./rtt";
+import { getRttPerMonth } from "./rtt";
 
 export interface DayDetail {
 	date: Temporal.PlainDate;
@@ -51,6 +51,7 @@ export function getDayDetails(
 
 	const nDaysOffPer30days =
 		((employeeSettings.nPerYear ?? 25) / date.daysInYear) * 30;
+	const rttPer30days = getRttPerMonth(date.year, employeeSettings);
 
 	let rttAtDateIterator = lastStatus.rttAtDate;
 	let nAtDateIterator = lastStatus.nAtDate;
@@ -65,15 +66,11 @@ export function getDayDetails(
 		let nDelta = 0;
 		let nMinusOneDelta = 0;
 
-		if (shouldBumpRtt(newDay, employeeSettings)) {
-			const rttPerYear = getRttPerYear(newDay.year, employeeSettings);
 
-			// TODO: minus rtt stock lost
-			rttDelta += rttPerYear;
-		}
-
+		// TODO: if we change year, we need to recompute values
 		if (newDay.since(employeeSettings.startDate).days % 30 === 0) {
 			nDelta += nDaysOffPer30days;
+			rttDelta += rttPer30days;
 		}
 
 		if (
