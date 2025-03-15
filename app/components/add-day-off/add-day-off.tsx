@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useSearchParams } from "react-router";
 import {
 	Dialog,
 	DialogActions,
@@ -26,11 +26,11 @@ export function AddDayOff({
 	from: string;
 	to: string;
 }) {
-	const navigate = useNavigate();
+	const [_, setSearchParams] = useSearchParams();
 	const [employeeSettings, setEmployeeSettings] = useEmployeeSettings();
 
 	function handleClose() {
-		navigate("/");
+		setSearchParams({});
 	}
 
 	const startDate = Temporal.PlainDate.from(from);

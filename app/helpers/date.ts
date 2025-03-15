@@ -14,3 +14,11 @@ export function isDateBetweenIncl(
 		Temporal.PlainDate.compare(date, right) <= 0
 	);
 }
+
+export function isDate(input: string): boolean {
+	try {
+		return Temporal.PlainDate.from(input).toString() === input;
+	} catch {
+		return false;
+	}
+}

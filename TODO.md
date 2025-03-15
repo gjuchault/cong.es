@@ -7,8 +7,11 @@
 - [x] Afficher la somme des N sur le calendrier
 - [x] Afficher la somme des N-1 sur le calendrier
 - [x] Calcul du meilleur choix
-- [ ] Gestion du stock perdu
+- [x] Gestion du stock perdu
+- [x] highlight days where counts change
 - [ ] Settings en modal
 - [ ] Half days
 - [ ] Dark mode calendar
+- [ ] Mobile mode
 - [x] Publish on github
+- [x] Use query params

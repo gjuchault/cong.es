@@ -7,8 +7,9 @@ import { roundingMethodSchema } from "~/domain/helpers/round";
 import { rttTypeSchema } from "~/domain/rtt";
 import { plainDateSchema } from "~/helpers/schemas";
 import { useEmployeeSettings } from "~/hooks/use-employee-settings";
-import type { Route } from "./+types/home";
 import { AddDayOff } from "~/components/add-day-off/add-day-off";
+import { useSearchParams } from "react-router";
+import { parseFromTo } from "~/helpers/parse-from-to";
 
 export function meta() {
 	return [
@@ -17,8 +18,10 @@ export function meta() {
 	];
 }
 
-export default function Home({ params }: Route.LoaderArgs) {
+export default function Home() {
+	const [searchParams] = useSearchParams();
 	const [employeeSettings, setEmployeeSettings] = useEmployeeSettings();
+	const { from, to } = parseFromTo(searchParams);
 
 	function handleStartDateChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const parseResult = plainDateSchema.safeParse(e.target.value);
@@ -76,8 +79,8 @@ export default function Home({ params }: Route.LoaderArgs) {
 
 	return (
 		<div>
-			{params.from !== undefined && params.to !== undefined && (
-				<AddDayOff from={params.from} to={params.to} />
+			{from !== undefined && to !== undefined && (
+				<AddDayOff from={from} to={to} />
 			)}
 			<Field>
 				<Label>Date de d'entrée en poste</Label>
@@ -123,7 +126,7 @@ export default function Home({ params }: Route.LoaderArgs) {
 					</Select>
 				</Field>
 			</div>
-			<Calendar params={params} />
+			<Calendar from={from} to={to} />
 		</div>
 	);
 }

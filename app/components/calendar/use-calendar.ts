@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { Temporal } from "temporal-polyfill";
 import { round } from "~/domain/helpers/round";
 import { isDateBetweenIncl } from "~/helpers/date";
@@ -61,7 +61,7 @@ export function useCalendar({
 			}),
 		[yearMonth, employeeSettings.daysOff],
 	);
-	const navigate = useNavigate();
+	const [_, setSearchParams] = useSearchParams();
 
 	const dayDetailByDate = useMemo(
 		() => getDayDetailByDate({ calendar: generatedCalendar, employeeSettings }),
@@ -134,9 +134,10 @@ export function useCalendar({
 							startDaySelected !== undefined &&
 							endDaySelected !== undefined
 						) {
-							navigate(
-								`/${startDaySelected.toString()}/${endDaySelected.toString()}`,
-							);
+							setSearchParams({
+								from: startDaySelected.toString(),
+								to: endDaySelected.toString(),
+							});
 						}
 
 						setIsSelectionInitial(true);
@@ -150,7 +151,7 @@ export function useCalendar({
 			endDaySelected,
 			isSelectionInitial,
 			employeeSettings.roundingMethod,
-			navigate,
+			setSearchParams,
 		],
 	);
 

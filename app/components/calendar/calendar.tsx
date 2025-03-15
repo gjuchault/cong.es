@@ -14,14 +14,13 @@ import { MultiDayBadge } from "./multi-day-badge";
 import { dayOffTypeColor } from "~/domain/day";
 
 export function Calendar({
-	params,
+	from,
+	to,
 }: {
-	params: {
-		from?: string;
-		to?: string;
-	};
+	from?: string;
+	to?: string;
 }) {
-	const { yearMonth, setYearMonth, calendar } = useCalendar(params);
+	const { yearMonth, setYearMonth, calendar } = useCalendar({ from, to });
 
 	const yearMonthAsString = yearMonth.toLocaleString("fr", {
 		month: "long",
@@ -121,7 +120,15 @@ export function Calendar({
 					</div>
 					<div className="flex bg-gray-200 text-xs/6 text-gray-700 lg:flex-auto">
 						<div className="w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
-							{calendar.map((day) => {
+							{calendar.map((day, index) => {
+								const todaySum = safe(day.n + day.nMinusOne + day.rtt);
+								const isSameThanPreviousDay =
+									index > 0 &&
+									safe(
+										calendar[index - 1].n +
+											calendar[index - 1].nMinusOne +
+											calendar[index - 1].rtt,
+									) === todaySum;
 								return (
 									<div
 										key={day.date.toString()}
@@ -148,8 +155,13 @@ export function Calendar({
 											{day.date.day.toString()}
 										</time>
 										<div>
-											<Badge color="purple" className="group-hover:hidden">
-												{safe(day.n + day.nMinusOne + day.rtt)}
+											<Badge
+												color="purple"
+												className={clsx("group-hover:hidden", {
+													"opacity-40": isSameThanPreviousDay,
+												})}
+											>
+												{todaySum}
 											</Badge>
 											<div className="hidden group-hover:flex gap-1">
 												<Badge color={dayOffTypeColor.n}>N: {day.n}</Badge>
