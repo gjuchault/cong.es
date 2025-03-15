@@ -2,6 +2,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
+	CogIcon,
 	EllipsisHorizontalIcon,
 } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
@@ -12,11 +13,14 @@ import { useCalendar } from "./use-calendar";
 import { safe } from "~/domain/helpers/safe";
 import { MultiDayBadge } from "./multi-day-badge";
 import { dayOffTypeColor } from "~/domain/day";
+import { Button } from "../catalyst/button";
 
 export function Calendar({
+	onOpenSettings,
 	from,
 	to,
 }: {
+	onOpenSettings(): void;
 	from?: string;
 	to?: string;
 }) {
@@ -38,6 +42,10 @@ export function Calendar({
 						</time>
 					</h1>
 					<div className="flex items-center">
+						<Button color="light" className="mr-2" onClick={onOpenSettings}>
+							<CogIcon />
+							Réglages
+						</Button>
 						<div className="relative flex items-center rounded-md bg-white shadow-xs md:items-stretch">
 							<button
 								type="button"
@@ -202,7 +210,7 @@ export function Calendar({
 													{day.bankHoliday.label}
 												</p>
 												<span className="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block">
-													{day.bankHoliday.type}
+													Ferié
 												</span>
 											</span>
 										)}

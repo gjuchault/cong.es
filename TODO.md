@@ -9,7 +9,7 @@
 - [x] Calcul du meilleur choix
 - [x] Gestion du stock perdu
 - [x] highlight days where counts change
-- [ ] Settings en modal
+- [x] Settings en modal
 - [ ] Half days
 - [ ] Dark mode calendar
 - [ ] Mobile mode
