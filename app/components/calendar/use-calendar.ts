@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { Temporal } from "temporal-polyfill";
 import { round } from "~/domain/helpers/round";
-import { isDateBetweenIncl } from "~/helpers/date";
+import { getRealFirstLast, isDateBetweenIncl } from "~/helpers/date";
 import { useEmployeeSettings } from "~/hooks/use-employee-settings";
 import { generateCalendar } from "~/domain/generate-month";
 import { getDayDetailByDate } from "~/domain/get-day-detail-by-date";
@@ -20,7 +20,7 @@ export function useCalendar({
 	from?: string;
 	to?: string;
 }) {
-	const [startDaySelected, setStartDaySelected] = useState<
+	const [maybeStartDaySelected, setStartDaySelected] = useState<
 		Temporal.PlainDate | undefined
 	>(() => {
 		try {
@@ -29,7 +29,7 @@ export function useCalendar({
 			return undefined;
 		}
 	});
-	const [endDaySelected, setEndDaySelected] = useState<
+	const [maybeEndDaySelected, setEndDaySelected] = useState<
 		Temporal.PlainDate | undefined
 	>(() => {
 		try {
@@ -38,6 +38,8 @@ export function useCalendar({
 			return undefined;
 		}
 	});
+
+	const [startDaySelected, endDaySelected] = getRealFirstLast(maybeStartDaySelected, maybeEndDaySelected)
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: meant to reset state
 	useEffect(() => {

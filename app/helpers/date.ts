@@ -22,3 +22,22 @@ export function isDate(input: string): boolean {
 		return false;
 	}
 }
+
+export function getRealFirstLast(
+	date1: Temporal.PlainDate | undefined,
+	date2: Temporal.PlainDate | undefined,
+): [Temporal.PlainDate | undefined, Temporal.PlainDate | undefined] {
+	if (date1 === undefined && date2 === undefined) {
+		return [undefined, undefined];
+	}
+
+	if (date2 === undefined || date1 === undefined) {
+		return [date2 ?? date1, undefined]
+	}
+
+	if (Temporal.PlainDate.compare(date1, date2) > 0) {
+		return [date2, date1];
+	}
+
+	return [date1, date2];
+}

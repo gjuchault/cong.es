@@ -15,3 +15,4 @@
 - [ ] Mobile mode
 - [x] Publish on github
 - [x] Use query params
+- [ ] Remove day off
