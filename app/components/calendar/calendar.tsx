@@ -14,6 +14,7 @@ import { safe } from "~/domain/helpers/safe";
 import { MultiDayBadge } from "./multi-day-badge";
 import { dayOffTypeColor } from "~/domain/day";
 import { Button } from "../catalyst/button";
+import { Heading } from "../catalyst/heading";
 
 export function Calendar({
 	onOpenSettings,
@@ -33,101 +34,71 @@ export function Calendar({
 	});
 
 	return (
-		<div className="bg-gray-50 lg:h-0 lg:min-h-[768px]">
-			<div className="lg:flex lg:h-full lg:flex-col">
-				<header className="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
-					<h1 className="text-base font-semibold text-gray-900">
+		<div className="bg-zinc-50 dark:bg-zinc-900 h-0 min-h-[768px]">
+			<div className="flex h-full flex-col">
+				<header className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 p-6 dark:border-white/10">
+					<Heading>
 						<time dateTime={yearMonth.toString()} className="capitalize">
 							<ClientOnly fallback="2025">{yearMonthAsString}</ClientOnly>
 						</time>
-					</h1>
-					<div className="flex items-center">
-						<Button color="light" className="mr-2" onClick={onOpenSettings}>
+					</Heading>
+					<div className="flex gap-4">
+						<Button className="mr-2" onClick={onOpenSettings}>
 							<CogIcon />
 							Réglages
 						</Button>
-						<div className="relative flex items-center rounded-md bg-white shadow-xs md:items-stretch">
-							<button
-								type="button"
-								className="flex h-9 w-12 items-center justify-center rounded-l-md border-y border-l border-gray-300 pr-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pr-0 md:hover:bg-gray-50"
-								onClick={() => {
-									setYearMonth((ym) => ym.add({ months: -1 }));
-								}}
+						<div className="relative flex items-center md:items-stretch">
+							<Button
+								className="mr-0.5"
+								onClick={() => setYearMonth((ym) => ym.add({ months: -1 }))}
 							>
 								<span className="sr-only">Mois précédent</span>
 								<ChevronLeftIcon className="size-5" aria-hidden="true" />
-							</button>
-							<button
-								type="button"
-								className="hidden border-y border-gray-300 px-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:relative md:block"
-								onClick={() => {
-									setYearMonth(Temporal.Now.plainDateISO().toPlainYearMonth());
-								}}
+							</Button>
+							<Button
+								onClick={() =>
+									setYearMonth(Temporal.Now.plainDateISO().toPlainYearMonth())
+								}
 							>
 								Aujourd'hui
-							</button>
-							<span className="relative -mx-px h-5 w-px bg-gray-300 md:hidden" />
-							<button
-								type="button"
-								className="flex h-9 w-12 items-center justify-center rounded-r-md border-y border-r border-gray-300 pl-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pl-0 md:hover:bg-gray-50"
-								onClick={() => {
-									setYearMonth((ym) => ym.add({ months: 1 }));
-								}}
+							</Button>
+							<span className="relative -mx-px h-5 w-px bg-zinc-300 md:hidden" />
+							<Button
+								className="ml-0.5"
+								onClick={() => setYearMonth((ym) => ym.add({ months: 1 }))}
 							>
 								<span className="sr-only">Mois suivant</span>
 								<ChevronRightIcon className="size-5" aria-hidden="true" />
-							</button>
+							</Button>
 						</div>
-						<Menu as="div" className="relative ml-6 md:hidden">
-							<MenuButton className="-mx-2 flex items-center rounded-full border border-transparent p-2 text-gray-400 hover:text-gray-500">
-								<span className="sr-only">Open menu</span>
-								<EllipsisHorizontalIcon className="size-5" aria-hidden="true" />
-							</MenuButton>
-
-							<MenuItems
-								transition
-								className="absolute right-0 z-10 mt-3 w-36 origin-top-right divide-y divide-gray-100 overflow-hidden rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-							>
-								<div className="py-1">
-									<MenuItem>
-										<button
-											type="button"
-											className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:text-gray-900 data-focus:outline-hidden"
-										>
-											Go to today
-										</button>
-									</MenuItem>
-								</div>
-							</MenuItems>
-						</Menu>
 					</div>
 				</header>
-				<div className="ring-1 shadow-sm ring-black/5 lg:flex lg:flex-auto lg:flex-col">
-					<div className="grid grid-cols-7 gap-px border-b border-gray-300 bg-gray-200 text-center text-xs/6 font-semibold text-gray-700 lg:flex-none">
-						<div className="bg-white py-2">
+				<div className="flex flex-auto flex-col">
+					<div className="grid grid-cols-7 gap-px border-b border-zinc-300 dark:border-zinc-600 bg-zinc-200 dark:bg-zinc-800 text-center text-xs/6 font-semibold text-zinc-700 dark:text-zinc-200 flex-none">
+						<div className="bg-white dark:bg-zinc-950 py-2">
 							M<span className="sr-only sm:not-sr-only">on</span>
 						</div>
-						<div className="bg-white py-2">
+						<div className="bg-white dark:bg-zinc-950 py-2">
 							T<span className="sr-only sm:not-sr-only">ue</span>
 						</div>
-						<div className="bg-white py-2">
+						<div className="bg-white dark:bg-zinc-950 py-2">
 							W<span className="sr-only sm:not-sr-only">ed</span>
 						</div>
-						<div className="bg-white py-2">
+						<div className="bg-white dark:bg-zinc-950 py-2">
 							T<span className="sr-only sm:not-sr-only">hu</span>
 						</div>
-						<div className="bg-white py-2">
+						<div className="bg-white dark:bg-zinc-950 py-2">
 							F<span className="sr-only sm:not-sr-only">ri</span>
 						</div>
-						<div className="bg-white py-2">
+						<div className="bg-white dark:bg-zinc-950 py-2">
 							S<span className="sr-only sm:not-sr-only">at</span>
 						</div>
-						<div className="bg-white py-2">
+						<div className="bg-white dark:bg-zinc-950 py-2">
 							S<span className="sr-only sm:not-sr-only">un</span>
 						</div>
 					</div>
-					<div className="flex bg-gray-200 text-xs/6 text-gray-700 lg:flex-auto">
-						<div className="w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
+					<div className="flex bg-zinc-200 dark:bg-zinc-800 text-xs/6 text-zinc-700 dark:text-zinc-200 flex-auto">
+						<div className="w-full grid grid-cols-7 grid-rows-6 gap-px">
 							{calendar.map((day, index) => {
 								const todaySum = safe(day.n + day.nMinusOne + day.rtt);
 								const isSameThanPreviousDay =
@@ -142,8 +113,8 @@ export function Calendar({
 										key={day.date.toString()}
 										className={clsx(
 											day.isCurrentMonth
-												? "bg-white"
-												: "bg-gray-50 text-gray-500",
+												? "bg-white dark:bg-zinc-950"
+												: "bg-zinc-50 dark:bg-zinc-900 text-zinc-500",
 											"relative px-3 py-2",
 											"group",
 											"select-none",
@@ -206,10 +177,10 @@ export function Calendar({
 												className="group flex"
 												key={day.bankHoliday.date.toString()}
 											>
-												<p className="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">
+												<p className="flex-auto truncate font-medium text-zinc-900 group-hover:text-indigo-600">
 													{day.bankHoliday.label}
 												</p>
-												<span className="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block">
+												<span className="ml-3 flex-none text-zinc-500 group-hover:text-indigo-600 block">
 													Ferié
 												</span>
 											</span>

@@ -11,7 +11,7 @@
 - [x] highlight days where counts change
 - [x] Settings en modal
 - [ ] Half days
-- [ ] Dark mode calendar
+- [x] Dark mode calendar
 - [ ] Mobile mode
 - [x] Publish on github
 - [x] Use query params
