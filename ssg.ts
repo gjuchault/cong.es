@@ -7,7 +7,7 @@ async function ssg() {
 
   await Bun.write(
     Bun.file("./dist/index.html"),
-    Bun.file("./build/client/:from?/:to?/index.html")
+    Bun.file("./build/client/cong.es/index.html")
   )
 
   await cp("./build/client/assets", "./dist/assets", { recursive: true })
