@@ -12,7 +12,7 @@
 - [x] Settings en modal
 - [ ] Half days
 - [x] Dark mode calendar
-- [ ] Mobile mode
+- [x] Mobile mode
 - [x] Publish on github
 - [x] Use query params
 - [ ] Remove day off

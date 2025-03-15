@@ -35,6 +35,27 @@ const colors = {
 	zinc: "bg-zinc-600/10 text-zinc-700 group-data-hover:bg-zinc-600/20 dark:bg-white/5 dark:text-zinc-400 dark:group-data-hover:bg-white/10",
 };
 
+const textOnlyColors = {
+	red: "text-red-700 dark:text-red-400",
+	orange: "text-orange-700 dark:text-orange-400",
+	amber: "text-amber-700 dark:text-amber-400",
+	yellow: "text-yellow-700 dark:text-yellow-300",
+	lime: "text-lime-700 dark:text-lime-300",
+	green: "text-green-700 dark:text-green-400",
+	emerald: "text-emerald-700 dark:text-emerald-400",
+	teal: "text-teal-700 dark:text-teal-300",
+	cyan: "text-cyan-700 dark:text-cyan-300",
+	sky: "text-sky-700 dark:text-sky-300",
+	blue: "text-blue-700 dark:text-blue-400",
+	indigo: "text-indigo-700 dark:text-indigo-400",
+	violet: "text-violet-700 dark:text-violet-400",
+	purple: "text-purple-700 dark:text-purple-400",
+	fuchsia: "text-fuchsia-700 dark:text-fuchsia-400",
+	pink: "text-pink-700 dark:text-pink-400",
+	rose: "text-rose-700 dark:text-rose-400",
+	zinc: "text-zinc-700 dark:text-zinc-400",
+};
+
 export interface BadgeProps {
 	color?: keyof typeof colors;
 }
@@ -53,6 +74,31 @@ export function Badge({
 				colors[color],
 			)}
 		/>
+	);
+}
+
+export function BadgeOrColoredText({
+	color = "zinc",
+	className,
+	...props
+}: BadgeProps & React.ComponentPropsWithoutRef<"span">) {
+	return (
+		<>
+			<Badge
+				color={color}
+				className={clsx(className, "hidden! sm:inline!")}
+				{...props}
+			/>
+			<span
+				className={clsx(
+					className,
+					textOnlyColors[color],
+					"text-sm/5 inline! sm:hidden!",
+				)}
+			>
+				{props.children}
+			</span>
+		</>
 	);
 }
 

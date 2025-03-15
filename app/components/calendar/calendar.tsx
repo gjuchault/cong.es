@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
 import { Temporal } from "temporal-polyfill";
-import { Badge } from "../catalyst/badge";
+import { Badge, BadgeOrColoredText } from "../catalyst/badge";
 import { ClientOnly } from "../client-only";
 import { useCalendar } from "./use-calendar";
 import { safe } from "~/domain/helpers/safe";
@@ -36,41 +36,40 @@ export function Calendar({
 	return (
 		<div className="bg-zinc-50 dark:bg-zinc-900 h-0 min-h-[768px]">
 			<div className="flex h-full flex-col">
-				<header className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 p-6 dark:border-white/10">
+				<header className="w-full flex flex-wrap items-center gap-4 border-b border-zinc-950/10 p-6 dark:border-white/10">
 					<Heading>
 						<time dateTime={yearMonth.toString()} className="capitalize">
 							<ClientOnly fallback="2025">{yearMonthAsString}</ClientOnly>
 						</time>
 					</Heading>
-					<div className="flex gap-4">
-						<Button className="mr-2" onClick={onOpenSettings}>
-							<CogIcon />
-							Réglages
+					<div className="flex-1" />
+					<Button onClick={onOpenSettings}>
+						<CogIcon />
+						Réglages
+					</Button>
+					<div className="relative flex items-center justify-end md:items-stretch sm:w-auto w-full">
+						<Button
+							className="mr-0.5"
+							onClick={() => setYearMonth((ym) => ym.add({ months: -1 }))}
+						>
+							<span className="sr-only">Mois précédent</span>
+							<ChevronLeftIcon className="size-5" aria-hidden="true" />
 						</Button>
-						<div className="relative flex items-center md:items-stretch">
-							<Button
-								className="mr-0.5"
-								onClick={() => setYearMonth((ym) => ym.add({ months: -1 }))}
-							>
-								<span className="sr-only">Mois précédent</span>
-								<ChevronLeftIcon className="size-5" aria-hidden="true" />
-							</Button>
-							<Button
-								onClick={() =>
-									setYearMonth(Temporal.Now.plainDateISO().toPlainYearMonth())
-								}
-							>
-								Aujourd'hui
-							</Button>
-							<span className="relative -mx-px h-5 w-px bg-zinc-300 md:hidden" />
-							<Button
-								className="ml-0.5"
-								onClick={() => setYearMonth((ym) => ym.add({ months: 1 }))}
-							>
-								<span className="sr-only">Mois suivant</span>
-								<ChevronRightIcon className="size-5" aria-hidden="true" />
-							</Button>
-						</div>
+						<Button
+							onClick={() =>
+								setYearMonth(Temporal.Now.plainDateISO().toPlainYearMonth())
+							}
+						>
+							Aujourd'hui
+						</Button>
+						<span className="relative -mx-px h-5 w-px bg-zinc-300 md:hidden" />
+						<Button
+							className="ml-0.5"
+							onClick={() => setYearMonth((ym) => ym.add({ months: 1 }))}
+						>
+							<span className="sr-only">Mois suivant</span>
+							<ChevronRightIcon className="size-5" aria-hidden="true" />
+						</Button>
 					</div>
 				</header>
 				<div className="flex flex-auto flex-col">
@@ -115,7 +114,7 @@ export function Calendar({
 											day.isCurrentMonth
 												? "bg-white dark:bg-zinc-950"
 												: "bg-zinc-50 dark:bg-zinc-900 text-zinc-500",
-											"relative px-3 py-2",
+											"relative px-2 py-1 sm:px-3 sm:py-2",
 											"group",
 											"select-none",
 										)}
@@ -134,14 +133,18 @@ export function Calendar({
 											{day.date.day.toString()}
 										</time>
 										<div>
-											<Badge
-												color="purple"
+											<span
 												className={clsx("group-hover:hidden", {
 													"opacity-40": isSameThanPreviousDay,
 												})}
 											>
-												{todaySum}
-											</Badge>
+												<BadgeOrColoredText
+													className="text-xs/5!"
+													color="purple"
+												>
+													{todaySum}
+												</BadgeOrColoredText>
+											</span>
 											<div className="hidden group-hover:flex gap-1">
 												<Badge color={dayOffTypeColor.n}>N: {day.n}</Badge>
 												<Badge color={dayOffTypeColor.nMinusOne}>
