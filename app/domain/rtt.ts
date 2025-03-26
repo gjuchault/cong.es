@@ -2,10 +2,10 @@ import { Temporal } from "temporal-polyfill";
 import { z } from "zod";
 import type { DaysOff, ExpandedDayOff } from "./day";
 import type { EmployeeSettings } from "./employee-settings";
-import { round } from "./helpers/round";
-import { weekendsDays } from "./helpers/weekends";
 import { expandDaysOff } from "./expand-days-off";
 import { bankHolidays } from "./helpers/bank-holidays";
+import { round } from "./helpers/round";
+import { weekendsDays } from "./helpers/weekends";
 
 export const rttTypeSchema = z.union([
 	z.literal("no-rtt"),
@@ -21,7 +21,10 @@ export const rttTypeSchema = z.union([
 
 export type RttType = z.infer<typeof rttTypeSchema>;
 
-function isDayOffImpactingRtt(year: number, dayOff: Pick<DaysOff, "from" | "type">): boolean {
+function isDayOffImpactingRtt(
+	year: number,
+	dayOff: Pick<DaysOff, "from" | "type">,
+): boolean {
 	if (dayOff.from.year !== year) {
 		return false;
 	}
@@ -98,7 +101,6 @@ export function getRttPerMonth(
 			(startDate.daysInYear - startDate.dayOfYear) / startDate.daysInYear;
 		return round((rttPerYear * proRata) / 12, roundingMethod);
 	}
-
 
 	return round(rttPerYear / 12, roundingMethod);
 }

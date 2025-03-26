@@ -1,6 +1,6 @@
-import { type DayDetail, getDayDetails } from "./get-day-details";
-import type { EmployeeSettings } from "./employee-settings";
 import type { Day } from "./day";
+import type { EmployeeSettings } from "./employee-settings";
+import { type DayDetail, getDayDetails } from "./get-day-details";
 
 export function getDayDetailByDate({
 	calendar,

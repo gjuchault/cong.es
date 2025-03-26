@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { Temporal } from "temporal-polyfill";
-import { round } from "~/domain/helpers/round";
-import { getRealFirstLast, isDateBetweenIncl } from "~/helpers/date";
-import { useEmployeeSettings } from "~/hooks/use-employee-settings";
 import { generateCalendar } from "~/domain/generate-month";
 import { getDayDetailByDate } from "~/domain/get-day-detail-by-date";
 import { bankHolidays } from "~/domain/helpers/bank-holidays";
+import { round } from "~/domain/helpers/round";
+import { getRealFirstLast, isDateBetweenIncl } from "~/helpers/date";
+import { useEmployeeSettings } from "~/hooks/use-employee-settings";
 
 const bankHolidayNamePerPlainDateISO = new Map(
-	bankHolidays
-		.map((dayOff) => [dayOff.from.toString(), dayOff.name] as const),
+	bankHolidays.map((dayOff) => [dayOff.from.toString(), dayOff.name] as const),
 );
 
 export function useCalendar({
@@ -39,7 +38,10 @@ export function useCalendar({
 		}
 	});
 
-	const [startDaySelected, endDaySelected] = getRealFirstLast(maybeStartDaySelected, maybeEndDaySelected)
+	const [startDaySelected, endDaySelected] = getRealFirstLast(
+		maybeStartDaySelected,
+		maybeEndDaySelected,
+	);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: meant to reset state
 	useEffect(() => {
@@ -59,7 +61,7 @@ export function useCalendar({
 			generateCalendar({
 				yearMonth,
 				bankHolidayNamePerPlainDateISO,
-				daysOff: employeeSettings.daysOff
+				daysOff: employeeSettings.daysOff,
 			}),
 		[yearMonth, employeeSettings.daysOff],
 	);
@@ -96,23 +98,29 @@ export function useCalendar({
 				const isLastOfSelection =
 					isDaySelected && endDaySelected.equals(day.date);
 
-				const dayOff = day.events.filter((event) => event.type !== "bankHoliday").at(0);
-				const dayOffProps = dayOff ? {
-					hasDayOff: true,
-					type: dayOff.type,
-					label: dayOff.label,
-					isFirstOff: dayOff.isStart,
-					isLastOff: dayOff.isEnd,
-				} as const : {
-					hasDayOff: false,
-				} as const;
+				const dayOff = day.events
+					.filter((event) => event.type !== "bankHoliday")
+					.at(0);
+				const dayOffProps = dayOff
+					? ({
+							hasDayOff: true,
+							type: dayOff.type,
+							label: dayOff.label,
+							isFirstOff: dayOff.isStart,
+							isLastOff: dayOff.isEnd,
+						} as const)
+					: ({
+							hasDayOff: false,
+						} as const);
 
 				return {
 					date: day.date,
 					isCurrentMonth: day.isCurrentMonth,
 					isToday: day.isToday,
 					...dayOffProps,
-					bankHoliday: day.events.filter((event) => event.type === "bankHoliday").at(0),
+					bankHoliday: day.events
+						.filter((event) => event.type === "bankHoliday")
+						.at(0),
 					n,
 					nMinusOne,
 					rtt,

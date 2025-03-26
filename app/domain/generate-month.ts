@@ -20,7 +20,7 @@ export function generateCalendar({
 }: {
 	yearMonth: Temporal.PlainYearMonth;
 	bankHolidayNamePerPlainDateISO: Map<string, string>;
-	daysOff: DaysOff[]
+	daysOff: DaysOff[];
 }): Day[] {
 	const startDate = yearMonth.toPlainDate({ day: 1 });
 
@@ -31,10 +31,9 @@ export function generateCalendar({
 	let baseDaysToAdd = 0;
 
 	const allExpandedDaysOffByDate = new Map(
-		daysOff.flatMap((dayOff) => expandDaysOff(dayOff)).map((dayOff) => [
-			dayOff.date.toString(),
-			dayOff,
-		]),
+		daysOff
+			.flatMap((dayOff) => expandDaysOff(dayOff))
+			.map((dayOff) => [dayOff.date.toString(), dayOff]),
 	);
 
 	while (true) {
@@ -65,7 +64,7 @@ export function generateCalendar({
 					label: bankHoliday,
 					fromHalfOnly: false,
 					toHalfOnly: false,
-				})
+				});
 			}
 
 			const expandedDayOff = allExpandedDaysOffByDate.get(entry.toString());
@@ -78,9 +77,8 @@ export function generateCalendar({
 					label: expandedDayOff.label,
 					fromHalfOnly: expandedDayOff.fromHalfOnly,
 					toHalfOnly: expandedDayOff.toHalfOnly,
-				})
+				});
 			}
-
 
 			row.push({
 				date: entry,

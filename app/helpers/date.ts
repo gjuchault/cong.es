@@ -32,7 +32,7 @@ export function getRealFirstLast(
 	}
 
 	if (date2 === undefined || date1 === undefined) {
-		return [date2 ?? date1, undefined]
+		return [date2 ?? date1, undefined];
 	}
 
 	if (Temporal.PlainDate.compare(date1, date2) > 0) {

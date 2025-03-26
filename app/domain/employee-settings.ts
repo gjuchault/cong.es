@@ -4,7 +4,9 @@ import { daysOffSchema } from "./day";
 import { roundingMethodSchema } from "./helpers/round";
 import { rttTypeSchema } from "./rtt";
 
-export const startDateSchema = z.string().transform((value) => Temporal.PlainDate.from(value));
+export const startDateSchema = z
+	.string()
+	.transform((value) => Temporal.PlainDate.from(value));
 export const nPerYearSchema = z.number().int().safe().gt(8);
 
 export const employeeSettingsSchema = z.object({

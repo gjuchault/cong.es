@@ -1,4 +1,13 @@
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+import { Temporal } from "temporal-polyfill";
+import { type DaysOff, dayOffTypeColor } from "~/domain/day";
+import { getBestChoice } from "~/domain/get-best-choice";
+import { getDayDetails } from "~/domain/get-day-details";
+import { getWorkingDays } from "~/domain/get-working-days";
+import { useEmployeeSettings } from "~/hooks/use-employee-settings";
+import { Badge } from "../catalyst/badge";
+import { Button } from "../catalyst/button";
 import {
 	Dialog,
 	DialogActions,
@@ -7,17 +16,8 @@ import {
 	DialogTitle,
 } from "../catalyst/dialog";
 import { Field, FieldGroup, Label } from "../catalyst/fieldset";
-import { Select } from "../catalyst/select";
-import { Button } from "../catalyst/button";
-import { getBestChoice } from "~/domain/get-best-choice";
-import { Temporal } from "temporal-polyfill";
-import { getDayDetails } from "~/domain/get-day-details";
-import { useMemo, useState } from "react";
-import { useEmployeeSettings } from "~/hooks/use-employee-settings";
-import { Badge } from "../catalyst/badge";
-import { getWorkingDays } from "~/domain/get-working-days";
 import { Input } from "../catalyst/input";
-import { dayOffTypeColor, type DaysOff } from "~/domain/day";
+import { Select } from "../catalyst/select";
 
 export function AddDayOff({
 	from,

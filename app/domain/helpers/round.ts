@@ -5,7 +5,7 @@ export const roundingMethodSchema = z.union([
 	z.literal("ceil-int"),
 	z.literal("ceil-half"),
 	z.literal("round-half"),
-	z.literal("double-digit")
+	z.literal("double-digit"),
 ]);
 export type RoundingMethod = z.infer<typeof roundingMethodSchema>;
 
@@ -31,7 +31,9 @@ export function round(
 			value = Math.round(input * 100) / 100;
 			break;
 		default:
-			throw new Error(`Unknown rounding method: ${roundingMethod satisfies never}`);
+			throw new Error(
+				`Unknown rounding method: ${roundingMethod satisfies never}`,
+			);
 	}
 
 	return safe(value);

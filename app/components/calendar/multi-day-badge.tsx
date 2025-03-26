@@ -1,6 +1,6 @@
+import { clsx } from "clsx";
 import type { PropsWithChildren } from "react";
 import { Badge, type BadgeProps } from "../catalyst/badge";
-import { clsx } from "clsx";
 
 export function MultiDayBadge({
 	color,

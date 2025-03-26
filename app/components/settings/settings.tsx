@@ -1,3 +1,10 @@
+import { useEffect, useState } from "react";
+import { Temporal } from "temporal-polyfill";
+import { nPerYearSchema } from "~/domain/employee-settings";
+import { roundingMethodSchema } from "~/domain/helpers/round";
+import { rttTypeSchema } from "~/domain/rtt";
+import { useEmployeeSettings } from "~/hooks/use-employee-settings";
+import { Button } from "../catalyst/button";
 import {
 	Dialog,
 	DialogActions,
@@ -6,15 +13,8 @@ import {
 	DialogTitle,
 } from "../catalyst/dialog";
 import { Field, FieldGroup, Label } from "../catalyst/fieldset";
-import { Select } from "../catalyst/select";
-import { Button } from "../catalyst/button";
-import { Temporal } from "temporal-polyfill";
-import { useState } from "react";
-import { useEmployeeSettings } from "~/hooks/use-employee-settings";
 import { Input } from "../catalyst/input";
-import { roundingMethodSchema } from "~/domain/helpers/round";
-import { nPerYearSchema } from "~/domain/employee-settings";
-import { rttTypeSchema } from "~/domain/rtt";
+import { Select } from "../catalyst/select";
 
 export function Settings({
 	isOpen,
@@ -32,6 +32,13 @@ export function Settings({
 	const [roundingMethod, setRoundingMethod] = useState(
 		employeeSettings.roundingMethod,
 	);
+
+	useEffect(() => {
+		setStartDate(employeeSettings.startDate.toString());
+		setRttType(employeeSettings.rttType);
+		setNPerYear(employeeSettings.nPerYear);
+		setRoundingMethod(employeeSettings.roundingMethod);
+	}, [employeeSettings]);
 
 	function handleSaveSettings() {
 		setEmployeeSettings({

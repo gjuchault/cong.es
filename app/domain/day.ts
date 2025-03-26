@@ -20,7 +20,7 @@ export type DaysOff = z.infer<typeof daysOffSchema>;
 
 export interface ExpandedDayOff {
 	type: DaysOff["type"];
-	date: Temporal.PlainDate
+	date: Temporal.PlainDate;
 	isStart: boolean;
 	isEnd: boolean;
 	label: string;
@@ -36,8 +36,8 @@ export interface Day {
 }
 
 export const dayOffTypeColor: Record<DaysOff["type"], BadgeProps["color"]> = {
-	"bankHoliday": "blue",
-	"nMinusOne": "indigo",
-	"n": "emerald",
-	"rtt": "yellow",
-}
+	bankHoliday: "blue",
+	nMinusOne: "indigo",
+	n: "emerald",
+	rtt: "yellow",
+};

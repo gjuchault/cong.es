@@ -7,14 +7,14 @@ import {
 } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
 import { Temporal } from "temporal-polyfill";
-import { Badge, BadgeOrColoredText } from "../catalyst/badge";
-import { ClientOnly } from "../client-only";
-import { useCalendar } from "./use-calendar";
-import { safe } from "~/domain/helpers/safe";
-import { MultiDayBadge } from "./multi-day-badge";
 import { dayOffTypeColor } from "~/domain/day";
+import { safe } from "~/domain/helpers/safe";
+import { Badge, BadgeOrColoredText } from "../catalyst/badge";
 import { Button } from "../catalyst/button";
 import { Heading } from "../catalyst/heading";
+import { ClientOnly } from "../client-only";
+import { MultiDayBadge } from "./multi-day-badge";
+import { useCalendar } from "./use-calendar";
 
 export function Calendar({
 	onOpenSettings,
