@@ -105,7 +105,7 @@ export function getDayDetails(
 					nDelta -= quantity;
 					break;
 				case "nMinusOne":
-					nDelta -= quantity;
+					nMinusOneDelta -= quantity;
 					break;
 				case "rtt":
 					rttDelta -= quantity;
